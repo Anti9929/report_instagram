@@ -1,0 +1,6 @@
+PWD /Users/rkempter/Dropbox/Semesterproject/Midterm-report/00_titlepage
+INPUT /usr/local/texlive/2012/texmf.cnf
+INPUT /usr/local/texlive/2012/texmf/web2c/texmf.cnf
+INPUT /usr/local/texlive/2012/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT titlepage.tex
+OUTPUT titlepage.log

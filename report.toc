@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Abstract}{3}{section.1}
+\contentsline {section}{\numberline {2}Introduction}{3}{section.2}
+\contentsline {section}{\numberline {3}Related work}{4}{section.3}
+\contentsline {section}{\numberline {4}Data Format}{4}{section.4}
+\contentsline {subsection}{\numberline {4.1}Exploratory Data analysis}{5}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Location information}{5}{subsubsection.4.1.1}
+\contentsline {paragraph}{\numberline {4.1.1.1}Most mentioned location names}{6}{paragraph.4.1.1.1}
+\contentsline {paragraph}{\numberline {4.1.1.2}Venues}{6}{paragraph.4.1.1.2}
+\contentsline {subsubsection}{\numberline {4.1.2}User information}{7}{subsubsection.4.1.2}
+\contentsline {subsubsection}{\numberline {4.1.3}Graph analysis}{8}{subsubsection.4.1.3}
+\contentsline {paragraph}{\numberline {4.1.3.1}Edge distribution and weights}{8}{paragraph.4.1.3.1}
+\contentsline {paragraph}{\numberline {4.1.3.2}Edge length}{8}{paragraph.4.1.3.2}
+\contentsline {paragraph}{\numberline {4.1.3.3}Degrees of nodes}{8}{paragraph.4.1.3.3}
+\contentsline {paragraph}{\numberline {4.1.3.4}Betweenness of nodes}{10}{paragraph.4.1.3.4}
+\contentsline {subsubsection}{\numberline {4.1.4}Communities}{10}{subsubsection.4.1.4}
+\contentsline {subsubsection}{\numberline {4.1.5}Hashtags}{10}{subsubsection.4.1.5}
+\contentsline {subsection}{\numberline {4.2}Conclusion}{11}{subsection.4.2}
+\contentsline {section}{\numberline {5}Architecture}{11}{section.5}
+\contentsline {subsection}{\numberline {5.1}Subscription and Storage}{13}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Densitiy-based clustering}{13}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}(Biterm) Topic Modeling}{14}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Set generation}{15}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Serving layer}{16}{subsection.5.5}
+\contentsline {subsubsection}{\numberline {5.5.1}Application}{16}{subsubsection.5.5.1}
+\contentsline {section}{\numberline {6}Results}{16}{section.6}
+\contentsline {section}{\numberline {7}Conclusion and future work}{16}{section.7}

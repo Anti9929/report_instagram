@@ -1,0 +1,381 @@
+%
+%
+% begin of preamble
+\input{00_preamble/preamble}
+% end of preamble
+% 
+% begin of document
+
+\begin{document}
+\input{00_titlepage/titlepage}
+\newpage
+\tableofcontents
+\newpage
+\section{Abstract}
+We often have a subject, a taste, a style or an interest that guides us to locations we like.  Using geo-localized photos from instagram and their associated hash-tags, we propose a batch processing system that: a) Automatically clusters the a set of instagrams based on the geographical coordinates, b) Extracts the most trending topics and c) Finally generates sets of locations that share the same topic. Through a web application, users can then browse the different topics and their corresponding locations.
+
+\section{Introduction}
+Instagram\footnote{\url{http://www.instagram.com}} is a mobile application used to upload photos and share them with friends and followers. Users have the ability to attach hash-tags to the posted image, that serve as topics and cluster similarly tagged photos together. Optionally, photos can be geo-localized, either using a location name or coordinates from the integrated GPS of the device. Instagram is a highly popular mobile application with over $300$ million users. Instagrams can be published either privately or to the entire world. For the second choice, instagram provides an API that allows access to all publicly posted instagrams\footnote{\url{http://instagram.com/developer/}}.
+
+Due to its large user base, instagrams are published all over the world and the application is heavily used while traveling.\footnote{\url{https://www.yahoo.com/travel/forget-selfies-instagram-actually-makes-traveling-99392573317.html}}. Because of the quantity of data accessible through the Application Programming Interface (API) and the recent success of startups (e.g. JetPac\footnote{\url{http://www.jetpac.com/}}, acquired by Google) using the user generated content to aggregate additional information about locations, we were motivated to extract sets of location that share a common topic. A topic is similar to a description using a bag of words. An example for a topic we extracted from our data set is "creative, diy, vintage". Using topics for travel recommendation has multiple advantages:
+\begin{enumerate}
+  \item Topics can be dynamic: Compared to both tags and categories, which characterize a location, topics can change over time and are an aggregation of locations. From our data set, we were able to extract topics such as "Christmas" or "Automn, fall".
+  \item A list of locations having something in common is an approach that has been used widely in different other areas, such as in music (Spotify Playlists) or fashion\footnote{\url{http://www.polyvore.com}}. In the area of traveling, different startups and established companies are trying to motivate people to create such lists (e.g. Airbnb\footnote{\url{http://www.airbnb}}).
+\end{enumerate}
+
+Users publishing a photo with a location attached often add hash-tags to describe the taken picture, the location or the mood. Our work is based on the assumption that the location where the picture was taken and the description with hash-tags are related. In other terms, we assume that the used hash-tags are a description of the location. We are well aware that this might not always be the case (for example, in the case where access is only possible through wifi and people tag all their photos with the place where they are while posting instead of where they took it). We try to consider this by preprocessing the data set carefully. The report is structured in the following way. We firstly present related work, characterize our extracted dataset, present the algorithm and architecture, followed by results and the conclusion.
+
+\section{Related work}
+For the domain of travel planning, not many related papers have been published so far. J-F. Bérubé et al. \cite{berube2006time} solves the travel planning problem by computing time-dependent shortest paths through a fixed sequence of nodes. Their work focuses mainly on optimizing the visit of a given set of nodes in order to see more. Their work divers from ours in the sense that our recommendations are based on only a topic. Yu Zheng et al. \cite{} propose the mining of GPS traces in order to generate two types of travel recommendations. The first type is a generic one, that recommends interesting travel locations and sequences in a given geospatial area. The second type are personalized recommendations matching her travel type. They introduce tree-based hierarchical graphs to model users' location histories and propose a Hypertext Induced Topic Search based model to infer the interest level of a location. For personalized recommendations, collaborative filtering methods are used. The used dataset differs significantly from ours. Compared to GPS traces, traces of instagrams suffer from sparsity. Shuangyu Yu et al. \cite{Yu:2014:PDJ:2678534.2678823} used a Instagram as their data source to recommend Hot Travel Routes. They present a novel concept, called Journey Group (JG), which is a group trajectory pattern reflecting a large number of users who walk through a common trajectory and present a novel Journey Group Trajectory Patterns mining strategy from user generated content based data. Part of their architecture and data cleaning is similar to ours. The processing of clusters differs from ours in the sense that they generated trajectory information based on timestamps and users with multiple instagrams. Our data analysis showed that such an approach can induce a bias. We therefore worked with textual content of instagrams instead.
+
+
+\section{Data Format}
+\label{sct:data}
+
+The dataset of instagrams has a total size of over $712000$ geo-located instagrams out of the environment from Paris, including Saint-Denis, Colombes and Versailles. The data has been captured between the $12th$ of October 2014 until the $10th$ of December 2014. The majority of the data is coming from the center of Paris. A subset of the data and its distribution using Google Fusion Tables and Google maps can be found here\footnote{\url{https://www.google.com/fusiontables/DataSource?docid=1nSFPl50d02v4hrNjWx0Vqp-o5lJzDoZOdXo7L2NS\#map:id=3/}}. The vast majority of clusters is located in the center of Paris.
+
+The data is retrieved in real-time from the Instagram servers. The Instagram API \cite{instagram_api} has adapted parts of the Pubsubhubbub protocol \cite{pubsubhubbub}, which allows being notified when a new photo was posted in a certain geographical area. Currently, our application does not take advantage of the real-time capabilities, as it requires changes in the infrastructure.
+
+Each instagram has the following attributes:
+\begin{enumerate}
+  \item Id - A unique value that identifies the instagram
+  \item user\_name - the author name of the instagram
+  \item user\_id - the id of the user
+  \item tags - A set of tags attached by the user to describe the taken photo
+  \item location\_name - users can attach a location name indicating the place where the photo was taken
+  \item location\_lat - geographical latitude where the photo was taken
+  \item location\_lng - geographical longitude where the photo was taken
+  \item filter - chosen filter for the photo
+  \item created\_time - Date \& Time when the photo was posted
+  \item image\_url - Url to the image
+  \item media\_url - Url to the instagram (including likes, text and comments)
+  \item text - The text attached to the instagram
+\end{enumerate}
+
+While all the photos have geographical coordinates (latitude and longitude), only a third of the data contains also contains data for the location\_name. We tried to correlated the location\_name column to the foursquare database and identified $10826$ different venues in Paris that were mentioned in instagrams. For all those venues, we retrieved through the application programming interface (API) of Foursquare additional information, including: the exact coordinates, the address, category, the price level (between 1 and 4) as well as different statistics, such as rating, count of check-ins, likes and tips.
+
+\subsection{Exploratory Data analysis}
+
+In this section, we describe the basic characteristics of the dataset. Only a subset ($84531$ instagrams) of the large dataset has been augmented with foursquare data.
+
+\subsubsection{Location information}
+
+Users can add the location name to their posting. This is quite a popular feature ($302164$ instagrams have a location\_name out of $712485$), making up $0.424$ percent of the data. Users can either select a place out of a list of locations or create the place themselves. Unfortunately, this introduces some noise and leads to ambiguities, because popular locations exist in different names for different languages. Furthermore, some users abuse the feature to post SPAM and advertisement messages. As stated in section \ref{sct:data}, we decided to pre-process and normalize the column location\_name by correlating the received location names with another popular venue service called Foursquare\footnote{https://foursquare.com/}. Foursquare has as instagram an API, that allows search for venues given a query and coordinates.
+
+\paragraph{Most mentioned location names}
+
+The distribution of location names follows a Zipfian distribution, as one can clearly see in the log-log plot in figure \ref{fig:location_name_log_log}.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/location_name_distribution_log_log}
+  \caption{Log-Log plot of rank and frequency of hashtags}
+  \label{fig:location_name_log_log}
+\end{figure}
+
+\begin{center}
+  \begin{tabular}{| l | l |}
+  \hline
+  Tour Eiffel & 12379 \\ \hline
+  Paris, France & 9856 \\ \hline
+  Musée du Louvre & 9028 \\ \hline
+  Fondation Louis Vuitton & 4474 \\ \hline
+  Cathédrale Notre-Dame de Paris & 3713 \\ \hline
+  Centre Pompidou & 3664 \\ \hline
+  Paris & 2607 \\ \hline
+  Château de Versailles & 2533 \\ \hline
+  Sacré-Coeur, Paris & 2507 \\ \hline
+  Galeries Lafayette & 2144 \\ \hline
+  Tour Eiffel - Place Du Trocadero & 1982 \\ \hline
+  Eiffel Tower & 1826 \\ \hline
+  Jardin des Tuileries & 1794 \\ \hline
+  Paris Bercy (Officiel) & 1748 \\ \hline
+  Place de la concorde & 1671 \\ \hline
+  Montmartre & 1628 \\ \hline
+  Jardin du Luxembourg & 1610 \\ \hline
+  Champs Elysees Paris & 1449 \\ \hline
+  Grand Palais Paris & 1232 \\ \hline
+  Avenue des Champs-Elysées & 1206 \\ \hline
+  \end{tabular}
+\end{center}
+
+\paragraph{Venues} The locations that are left over after having pre processed the location\_name column are the venues. For all venues, we have additional data, such as the category and price level, exact coordinates and statistics about check-ins. Mostly, we were interested in knowing the distribution of categories of locations, as showed in figure \ref{fig:category_distribution}. The amount of streets, homes, office and hotels is surprisingly high.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/category_distribution}
+  \caption{Distribution of categories of locations}
+  \label{fig:category_distribution}
+\end{figure}
+
+\subsubsection{User information}
+
+In this section, we'll describe the characteristics of users in the dataset. The dataset has a total of $162'972$ users. Each user takes on average $4.371825$ instagrams. The median is $2$, standard deviation is $9.347827$. Minimum is equal to $1$, maximum equal to $937$. The first $10'000$ users can be modeled by a power law distribution, as it is observable in figure \ref{fig:user_instagram}. The low median explains the strong drop after user of rank $10^4$. $50\%$ of the users have taken 2 or less instagrams during their trip. 
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/user_instagram_log_log}
+  \caption{Distribution of instagram's per user}
+  \label{fig:user_instagram}
+\end{figure}
+
+\subsubsection{Graph analysis}
+
+Based on the correlated location data and the fact that some users have taken multiple photos, we generated an undirected graph. A node is equal to a venue, whereas an edge means that a person has taken an instagram at both places. The weight of an edge is equal to the number of people that have posted an instagram at both locations. As we are using the venue data, only a sample of about $84531$ of the original data is used. Interestingly, after building the graph, we find $233$ different unconnected components. The main component has $6414$ nodes, while the other $232$ subgraphs have a maximum of $4$ nodes (most of them have only $2$ nodes). We discarded all subgraphs but the main component in the graph analysis.
+
+\paragraph{Edge distribution and weights}
+There is a total of $x$ edges in the graph. Mean of edge weight is equal to $x$, median $x$, standard deviation $x$, minimum $x$ and maximum $x$. In figure, one can see the distribution of edge weights. The connected nodes of the top edges are listed in table $k$. 
+
+\begin{table}
+  \begin{tabularx}{\textwidth}{| X | X | X |}
+    \hline
+    \textbf{Edge weight} & \textbf{Node 1} & \textbf{Node 2} \\ \hline
+    729 & Musée du Louvre & Pont Alexandre III | Paris, FRA \\ \hline
+    502 & Tour Eiffel & Le Jules Verne \\ \hline
+    297 & Métro Porte de Versailles [12] & Place de la Porte de Versailles \\ \hline
+    246 & Parvis de Notre-Dame & Musée du Louvre \\ \hline
+    207 & Place du Trocadéro & Tour Eiffel \\ \hline
+    201 & Tour Eiffel & Château de Versailles \\ \hline
+    190 & Bibliothèque des Arts Décoratifs & Les Arts Décoratifs \\ \hline
+    171 & Tour Eiffel & Musée du Louvre \\ \hline
+    156 & paris drobs flat & Les Citadines \\ \hline
+    149 & Salon du Chocolat de Paris & Métro Porte de Versailles [12] \\ \hline
+    145 & Park \& Suites Grande Bibliotheque Hotel Paris & Musée du Louvre \\ \hline
+    140 & C.C Saint-Lazare Paris & Café Marco Polo \\ \hline
+    131 & Jardin d'Acclimatation & Fondation Louis Vuitton \\ \hline
+    128 & Le Florence & 101 Taipei \\ \hline
+    110 & Café Pasteur & Institut Pasteur \\ \hline
+    108 & Musée du Louvre & Musée National Gustave-Moreau \\ \hline
+    108 & La Paillasse & Carreau du Temple \\ \hline
+    106 & Musée du Louvre & Pont des Arts \\ \hline
+    104 & Arrêt Cité Palais de Justice & Musée National Gustave-Moreau \\ \hline
+    99 & Salon du Chocolat de Paris & Place de la Porte de Versailles \\ \hline
+    \hline
+  \end{tabularx}
+  \caption{Top edges in terms of weights and their associated nodes}
+  \label{table:edges}
+\end{table}
+
+\paragraph{Edge length}
+We were interested in knowing about the length of the edges, meaning the distance in meters between two instagrams taken by a users. We plotted two different figures: In figure \ref{fig:unweighted_edge_distance}, every edge is only counted once, while in figure \ref{fig:weighted_edge_distance}, each edge is counted its weight times. From comparison of the two figures, short edges have proportionally higher weights than longer edges. We have the following characteristics: Mean = $3433.18m$, Median = $2586.77$, maximum distance = $22153.2$, minimum distance = $0.0$. The maximum distance is from the center of Paris to Versailles.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/unweighted_edge_distance}
+  \caption{Histogram of edge length. Every edge is counted only once.}
+  \label{fig:unweighted_edge_distance}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/weighted_edge_distance}
+  \caption{Histogram of edge length. Every edge is counted $weight$ - times}
+  \label{fig:weighted_edge_distance}
+\end{figure}
+
+\paragraph{Degrees of nodes}
+The degree of a node is the number of edges incident to the node \ref{}. In our graph, the degree of a node is equal to the number of Instagrams taken at a location (multiple instagrams by a user at a location count as one). In figure \ref{}, once can see that the most popular touristic places in Paris have also the highest degree in the graph.
+
+\paragraph{Betweenness of nodes}
+The betweeness of a node is equal to the number of all shortest paths that go from one node to another node and pass through the the node in question. Betweenness indicates the centrality of a node in the network. A node that has a high betweenness value has a large influence on how people move from one place to the other, under the assumption that they take the shortest path. Again, the locations with the highest betweenness factors are the most well known and the set of top nodes is very equal to the set of top nodes with high node degrees. Figure \ref{} shows the locations plotted on a map, together with their associated betweenness value.
+
+\subsubsection{Communities}
+
+We also looked at the structure of communities inside the graph. For this, we used the Louvin Community detection algorithm proposed by V. Blondel and al. \cite{blondel2008fast}. It is implemented for the Python Networkx Package\footnote{{https://networkx.github.io/}} \ref{louvin-repository}, as well as for Gephi\footnote{https://gephi.github.io/}. The outcome was highly interesting: Most of the detected communities were extremely small ($4-5$ locations only), but there were 3 communities that had $321$, $398$ and $538$ locations. After further analysis of the geographical and categorical structure of those big communities, we were not able to find a specific pattern. One community seemed to have many more private homes and local restaurants but less hotels and could represent a community of local and french people. Unfortunately, it would be very difficult to verify this hypothesis. We though of one approach using the language in the comments. Unfortunately, the texts are mostly a set of hash-tags and very difficult to attribute to any language. Therefore, we didn't verify the hypothesis further. Figure \ref{} shows the histogram of communities (cut at size $100$, as there are only a few afterwards).
+
+\subsubsection{Hashtags}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/hashtag-log-log}
+  \caption{Log-Log plot of rank and frequency of hashtags}
+  \label{fig:hashtag_log_log}
+\end{figure}
+
+The total number of different hashtags equals $290588$. There are $x$ hashtags per instagram on average, with median equal to $median$. Standard deviation is equal to $std$, maximum to $max$ and minimum to $min$. The $20$ top instagrams are listed in table \ref{tbl:hashtags}. From the figure it is observable that many of the most popular hash-tags are general or instagram specific. As an example, the hash-tag "vscocam" is used by a mobile application called "VSCO" \footnote{\url{http://vsco.co/vscocam}}, which manipulates photos and posts them on instagram. The distribution is illustrated in as a log-log plot of the rank \& frequency in figure ~\ref{fig:hashtag_log_log}.
+
+\begin{center}
+  \begin{table}
+    \begin{tabular}{| l | l |}
+      \hline
+      \textbf{Hashtag} & \textbf{Frequency} \\ \hline
+      paris & 148190 \\ \hline
+      love & 33049 \\ \hline
+      france & 32439 \\ \hline
+      instagood & 18081 \\ \hline
+      picoftheday & 16081 \\ \hline
+      fashion & 15723 \\ \hline
+      photooftheday & 15293 \\ \hline
+      beautiful & 12822 \\ \hline
+      art & 11216 \\ \hline
+      friends & 11017 \\ \hline
+      tagsforlikes & 10831 \\ \hline
+      girl & 10678 \\ \hline
+      vscocam & 10667 \\ \hline
+      food & 10487 \\ \hline
+      happy & 10469 \\ \hline
+      followme & 10105 \\ \hline
+      instadaily & 9843 \\ \hline
+      igers & 9723 \\ \hline
+      me & 9601 \\ \hline
+      follow & 9373 \\ \hline
+      \hline
+    \end{tabular}
+    \caption{The 20 most popular hash-tags in the dataset}
+    \label{tbl:hashtags}
+  \end{table}
+\end{center}
+
+\subsection{Conclusion}
+
+We finalize this chapter with a conclusion about the exploratory data analysis. We indeed found  interesting characteristics of the data that help us further on developing the necessary architecture. We've seen that the median of taken instagrams per users is $2$, whereas the mean is over $4$. This strong skew is problematic when working with graphs, because: a) The generation of an edge requires at least $2$ posted instagrams. Therefore, we can use almost only half of our data. b) Many of the users contribute only $1$ or $2$ edges, but a couple of users add large amounts of edges. This may induce a strong bias, as the ones that add large amounts of edges are most probably not tourists. We also saw that using community detection algorithm yields large numbers of communities. The modularity factor of $0.405$ is medium. This could be interpreted that some sophisticated internal structure does exist. A deeper analysis of the communities could give perhaps additional insights and metrics to classify a location as rather touristic or local. The distribution of edge length is interesting, as most of the edges are very short length, especially because the center of Paris is quite large. We've seen that the number of hash-tags seems very promising. Applying pre-processing on the hash-tags, we could extract a part that follows the natural linguistic characteristics of a corpus and has related semantical meaning with the content. In the following chapter, we will describe how the extracted information has been leveraged to create an application.
+
+\section{Architecture}
+
+Currently, our architecture focuses on batch processing. In the future, the current architecture could be transformed into a real-time system, using incremental versions of the currently used algorithms. In figure \ref{fig:architecture}, one can see a simplified schema of the current processing architecture. In the next chapters, we'll detail them out more deeply.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{images/architecture}
+  \caption{Batch processing architecture of the current \#Travel system}
+  \label{fig:architecture}
+\end{figure}
+
+\subsection{Subscription and Storage}
+Instagram's API allows the subscription for geographical location. For each publicly posted instagram, the subscriber receives a notifaction from Instagram's server. He can then retrieve the complete instagram using the received identifier. The retrieval is limited to 5000 requests per hour \ref{}. Our system receives the events, requests the whole instagram and pushes it to a geospatial database. At the time of writing, the main table had a volumne of $700000$ instagrams.
+
+\subsection{Densitiy-based clustering}
+\label{sec:dbscan}
+The batch processing workflow starts with the location identification. For acceleration purposes, the geographical data is first partitioned using a grid-based approach. We draw a grid of $200$ on $200$ cells (@TODO: Put distance) over the city of Paris. The data of each cell (and surroundings, in case clusters are on the cell border) can now be processed separately (using distributed computing in case of large data sets). Our system uses the widely known DBSCAN \cite{Ester96adensity-based} (Density Based Spatial Clustering of Application with Noise) algorithm. A demonstration and implementation of the algorithm is provided by the Python Machine Learning Framework Scikit-Learn \cite{scikit-learn} and can be found here\footnote{$http://scikit-learn.org/stable/auto_examples/cluster/plot_dbscan.html$}. This algorithm has two hyperparameters:
+\begin{enumerate}
+  \item $MinPts$, which defines the minimum number of points required in a certain area for identifying a cluster. The value depends highly on the size of the data set. In our case, with $>700k$ data points, we chose it to be around $40$.
+  \item $\epsilon$ is a distance value that has to be chosen by the user as well. In our case, we set this value to $12m$
+\end{enumerate}
+
+In our dataset, DBSCAN finds a little bit more than $1000$ cluster locations. We reduce this number through a post processing sequence to $752$ locations. Our post processing sequence has two purposes:
+\begin{enumerate}
+  \item Eliminate clusters that have instagrams posted by less than $threshold$ users. Plot \ref{} is a histogram of clusters, binned by the number of active users. We chosen this $threshold$ to be equal to $MinPts$.
+  \item For each identified cluster, we try to assign a name. For this purpose, we make for each cluster a request to the Foursquare API. In case of a success, we retrieve the name, category, image and other information. For about 30\% of the cases, we are not able to find a match on Foursquare. Those clusters are eliminated.
+\end{enumerate}
+
+The result of the post processing step is stored in a second database for fast retrieval from the serving layer.
+
+\subsection{(Biterm) Topic Modeling}
+
+For the semantic clustering of our data, we tried different algorithms in the area of Topic Modeling. Conventional topic modeling techniques, such as Probabilistic Latent Space Indexing (PLSA) \cite{Hofmann99probabilisticlatent} or Latent Dirichlet Allocation \cite{lda} model a document as a mixture of topics. A topic is a set of correlated words, typically represented as a distribution of words over the vocabulary. Using statistical analysis, word distributions for each topic and topic proportions for each document are computed. Conventional topic models reveal topics within a text corpus by implicitly capturing the document-level word co-occurence patterns. Research shows \cite{btm} that directly applying these models on short texts, such as tweets, has bad performance due to the data sparsity problem.
+
+Applying topic modeling using Latent Dirichlet Allocation gave us rather bad results. You can see a list of topics coming from LDA in \ref{}. Due to the lack of performance, we were looking for approaches solving the issue of sparsity. As one can see in figure \ref{}, the number of hashtags per instagram is relatively low (mean is equal to $x$). Xueqi Cheng et al. \cite{btm} propose a new algorithm called "Biterm Topic Modeling", in short "BTM". Because conventional topic modeling approaches try to model word generation on a document level, the approaches are highly sensitive to the shortness of documents, due to the fact that co-occurence patterns in a single short documents are sparse and not reliable. Therefore, they propose in their paper to aggregate all word co-occurence patterns in the corpus, as these frequencies would be more stable.
+
+A document with three distinct words will generate three biterms: \[(w_1, w_2, w_3) \Rightarrow \{(w_1, w_2), (w_2, w_3), (w_1, w_3)\}
+\], where the tuples are unordered. The whole corpus turns into a biterm set after extraction of biterms out of each document. Instead of modeling the generation of words in documents, BTM models the generation of biterms. If two words co-occur frequently, chances are high that they belong to a same topic. Xueqi Cheng et al. provide besides the algorithm in the paper also a working version on a Google Code Repository \cite{btm-website}. We integrated their application into our workflow. It takes multiple steps to generate the topics and compute the distribution of topics inside a location. The following list documents the steps:
+\begin{enumerate}
+  \item In a first step, documents are cleaned such that words that occur too frequently are removed, as well as words that occur less than $10$ times in the whole corpus. A document is equal to the hash-tags posted with an instagram.
+  \item The BTM algorithm estimates the probabilities of $P(z)$ and $P(w|k)$ using the Gibbs algorithm described in \cite{btm}.
+  \item We use the inference algorithm of BTM to infer $P(z|d)$ for each document.
+  \item For each location cluster $C_i$ computed with DBSCAN described in section \ref{sec:dbscan}, we compute: \[
+  \frac{\sum_{p_j \in C_i} p_j}{|C_i|}
+  \]
+\end{enumerate}
+
+\subsection{Set generation}
+
+For each of the extracted topics $z$, we would like to generate the most adequate set of locations that could be interesting for a user. Besides accuracy, we identified diversity as an important factor for these sets: $5$ Art Museums for the topic "art" could be highly accurate, but it would be more interesting if a user could also get other locations in different categories (e.g. Restaurant, Bar) that match the topic.
+
+\begin{algorithm}
+\caption{Set computation algorithm}
+\label{alg:set}
+\begin{algorithmic}
+  \REQUIRE Matrix $M$ with $p_j = P(z_k|l_j)$ for each location $l_j$ and each topic $z_k$, Category $c_j$ for each location $j$, metric function $f$ that needs to be maximized
+  \ENSURE For each topic $z$, a set of $5$ locations
+  \FOR{$k=0$ to $N_z$}
+  \STATE $location\_index \leftarrow 6$
+  \STATE $m_k \leftarrow sort M[k]$
+  \STATE $R \leftarrow $ top 5 locations in $m_k$
+  \STATE $C \leftarrow $ categories of locations in set $R$
+  \STATE $best_result \leftarrow f(R, C)$
+  \STATE $best_set \leftarrow R$
+  \WHILE{$\text{unique categories in }$C$ \neq 5$}
+    \STATE $replace \leftarrow index, replace_val of lowest value in categories where |C_i| > 1$
+    \FOR{$index, replace_val in replace$}
+      \STATE $R_i[index] \leftarrow location\_index$
+      \STATE $C_i \leftarrow$ categories of locations in set $R_i$
+      \IF{$best_result > f(R_i, C_i)$}
+        \STATE $R \leftarrow R_i$
+        \STATE $best_result \leftarrow f(R_i, C_i)$
+      \ENDIF
+    \ENDFOR
+    \STATE $location\_index \leftarrow incr(1)$
+  \ENDWHILE
+  \ENDFOR
+\end{algorithmic}
+
+\end{algorithm}
+
+For each topic, we would like to generate the most adequate set of locations that could interest a user. We identified diversity as an important factor for these sets: $5$ Art Museum for the topic "art" could be highly accurate, but the usefulness is only limited. Our set generation algorithm should therefore favor topic sets that have a more diverse set of location categories. Our algorithm optimizes the formula:
+\[
+  f() = \lambda_{topic} * \sum{} + \lambda_{category} * \sum_{|C|} {1}
+\]
+
+We can show the two cases. We have set size of $l$ and the values $x_1, x_2, ..., x_l \in C_1$. All values are sorted such that $\forall i, j: x_i > x_j when i > j$. In the case of replacing $x_l with x_k$ where $k = l + 1$ and location $k \in C_1$. We see clearly that the we should not replace $x_l$ with $x_k$:
+\[
+  \lambda_1 * \sum_{i \in 1,...,l} {x_i} + \lambda_2 * 1 > \lambda_1 * \sum_{i \in 1,...,l-1,k} {x_i} + \lambda_2 * 1
+\]
+
+In the case that location $k \ in C_2$, we would have the following condition:
+\[
+  \lambda_1 * \sum{i \in 1,..,l}{x_i} + \lambda_2 * 1 > \lambda_1 * \sum_{i \in 1,...,l-1,k}{x_i} + \lambda_2 * 2
+\]
+Location $l$ is replaced by location $k$ if $x_k > \lambda_1 * x_l - \lambda_2$. We can easily see that the formula is easily generalizable.
+
+We set the ratio $\frac{\lambda_{category}}{\lambda_{topic}} = \frac{1}{2}$ and compute the $\lambda$'s such that in the best case, the top $5$ locations are all in different categories. In this case, we set $f() = 1$. In $xx$ one can see the algorithm that optimizes the $f$ in an efficient way.
+
+\subsection{Serving layer}
+
+The serving layer simply handles requests coming from users. The serving layer has access to the serving database and renders the data into a readable and accessible format to the user (HTML). The serving layer is accessible at $http://www.hashtag-travel.com$.
+
+\subsubsection{Application}
+
+The interface of the application is relatively simple and consists of mainly two views. The first view \ref{fig:title} allows the selection and discovery of the broad range of topics, whereas the second view \ref{fig:map} focuses on visualizing the different locations of the selected topic.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=1\textwidth]{images/title}
+  \caption{Title page of \#Travel}
+  \label{fig:title}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=1\textwidth]{images/map}
+  \caption{A set of locations for the topic "Seine, tower, concorde"}
+  \label{fig:map}
+\end{figure}
+
+\section{Results}
+
+In the following table, we listed the $40$ different extracted topics. For each topic, we list the set of $5$ locations (with the associated category name). 
+
+\section{Conclusion and future work}
+
+From a student point of view, this project was highly interesting. During the project, I walked through the following points:
+\begin{enumerate}
+  \item Think about the necessary data and possible data sources, retrieve enough data
+  \item Characterize the data using exploratory data science
+  \item Apply suitable techniques (DBSCAN, BTM) in order to make the data usable
+  \item Mash up data with other data sources
+  \item Engineer a work flow that generates a final result (sets)
+  \item Build a web application that allows users to interact with the final result 
+\end{enumerate}
+Nevertheless, there is still a lot of work to be done in order to make the workflow more efficient and more suitable to the needs of users. For future work, the batch processing could be ported to real-time, using incremental versions of both DBSCAN and BTM algorithms. As a result, real-time events happening in a city could be detected and suitable lists of locations recommended. A qualitative and quantitative evaluation process of the generated sets should be put in place, such that further improvements of the algorithm can be measured quantitatively. Furthermore, we suggest improvements in the set generation algorithm, taking into account additional features, such as distance and popularity.
+
+\newpage
+\nocite{*} 
+
+
+\bibliographystyle{unsrtnat} 
+
+\bibliography{references}
+
+\appendix
+
+\end{document}

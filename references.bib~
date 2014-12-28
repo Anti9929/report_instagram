@@ -1,0 +1,136 @@
+@ARTICLE{cite1,
+  author = {T. Skog, S. Ljungblad, L. E. Holmquist},
+  title = {Between aesthetics and utility: Designing ambient information visualizations},
+  journal = {Proceedings IEEE Syposium on Information Visualization},
+  pages = {30--37},
+  year = {2003}
+}
+
+@ARTICLE{cite2,
+  author = {S. K. Card, J. D. MacKinlay, and B. Shneiderman},
+  title = {Readings in Information Visualization: Using Vision to Think},
+  journal = {Morgan Kaufmann Publishers},
+  year = {1999}
+}
+
+@ARTICLE{cite3,
+  author = {P. Valdez, A. Mehrabian},
+  title = {Effects of Color on Emotions},
+  journal = {Journal of Experimental Psychology: General},
+  volume = {123},
+  number = {4},
+  year = {1994},
+  pages = {394--409}
+}
+
+@ARTICLE{cite4,
+  author = {S. Bhulai, P. Kampstra, L. Kooiman, G. Koole, M. Deurloo, B. Kok},
+  title = {Trend Visualization on Twitter: What's Hot and What's Not?},
+  journal = {conference},
+  year = {2012},
+  keywords = {microblogging; Twitter; trend detection; clustering; visualization; dynamic squarified treemaps}
+}.
+
+@ARTICLE{cite5,
+  title = {Is there science in visualization?},
+  year = {2006},
+  author = {T.J Jankun-Kelly, R. Kosara, G. Kindlmann, C. North, C. Ware, E. Wes Bethel},
+}
+
+@ARTICLE{cite6,
+  title = {Visualization Criticism - The Missing Link Between Information Visualization and Art},
+  author = {R. Kosara},
+  year = {2007},
+  journal = {Proceeding IV '07 Proceedings of the 11th International Conference Information Visualization},
+  pages = {631--636}
+}
+
+@ARTICLE{cite7,
+  title = {Visualization Criticism},
+  author = {R. Kosara, F. Drury, L. E. Holmquist, D. H. Laidlaw},
+  year = {2008},
+  journal = {Visualization Viewpoints}
+}
+
+@ARTICLE{cite8,
+  title = {Informative Art: Information Visualization in Everyday Environments},
+  author = {L. E. Holmquist, T. Skog},
+  journal = {GRAPHITE '03 Proceedings of the 1st international conference on Computer graphics and interactive techniques in Australasia and South East Asia},
+  pages = {229--235},
+  keywords = {Informative Art; information visualization; ubiquitous computing}
+}
+
+@ARTICLE{cite9,
+  title = {Twitter mood predicts the stock market},
+  author = {J. Bollen, H. Mao, X. Zeng},
+  journal = {Journal of Computer Science},
+  volume = {2},
+  issue = {1},
+  year = {2011},
+  pages = {1--8},
+  keywords = {Social networks; Sentiment tracking; Stock market; Collective mood}
+}
+
+@ARTICLE{cite11,
+  title = {Affective Norms for English Words (ANEW): Instruction Manual and Affective Ratings},
+  author = {M.M. Bradley, P.J. Lang},
+  year = {1999},
+  journal = {Technical Report C-1, The Center for Research in Psychophysiology}
+}
+
+@ARTICLE{cite10,
+  title = {An approach to environmental psychology},
+  author = {A. Mehrabian, J. A. Russell},
+  year = {1974},
+  journal = {Cambridge, MA: MIT Press}
+}
+
+@MISC{cite:mturk,
+  url = {https://www.mturk.com/mturk/welcome},
+  timestamp = {2012.11.21}
+}
+
+@MISC{cite:smartvote,
+  url = {http://www.smartvote.ch},
+  timestamp = {2012.11.21}
+}
+
+@MISC{cite:carnivore-project,
+  url = {http://r-s-g.org/carnivore/},
+  timestamp = {2012.11.21}
+}
+
+@MISC{cite:we-feel-fine,
+  url = {http://www.wefeelfine.org/},
+  timestamp = {2012.11.21}
+}
+
+@MISC{cite:restful,
+  url = {http://en.wikipedia.org/wiki/Representational_state_transfer},
+  timestamp = {2012.11.22}
+}
+
+@MISC{cite:guardian,
+  url = {http://www.guardian.co.uk/commentisfree/2012/aug/03/london-2012-olympics-open-data},
+  timestamp = {2012.11.21}
+}
+
+@MISC{cite:sublime,
+  url = {http://en.wikipedia.org/wiki/Sublime_(philosophy)},
+  timestamp = {2012.11.22}
+}
+
+@MISC{cite:nodejs,
+  url = {http://nodejs.org/},
+  timestamp = {2012.11.22}
+}
+
+@MISC{cite:backbone,
+  url = {http://backbonejs.org/},
+  timestamp = {2012.11.22}
+}
+
+@MISC{cite:raphael,
+  url = {http://raphaeljs.com},
+  timestamp = {2012.11.22}
+}
