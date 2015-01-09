@@ -1,4 +1,4 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{10}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -13,6 +13,16 @@ Jean-Fran{\c{c}}ois B{\'e}rub{\'e}, Jean-Yves Potvin, and Jean Vaucher.
 \newblock \emph{Computers and Operations Research}, 33\penalty0 (6):\penalty0
   1838--1856, 2006.
 
+\bibitem[Zheng et~al.(2009)Zheng, Xie, and Ma]{yuzhen}
+Yu~Zheng, Xing Xie, and Wei-Ying Ma.
+\newblock Mining interesting locations and travel sequences from gps
+  trajectories.
+\newblock In \emph{WWW 2009}. Association for Computing Machinery, Inc., April
+  2009.
+\newblock URL
+  \url{http://research.microsoft.com/apps/pubs/default.aspx?id=79440}.
+\newblock WWW 2009.
+
 \bibitem[Yu et~al.(2014)Yu, Yu, Li, and Liu]{Yu:2014:PDJ:2678534.2678823}
 Shuangyu Yu, Yaxin Yu, Yulong Li, and Xin Liu.
 \newblock Poptour: Discovering journey group t-patterns from instagram
@@ -23,14 +33,6 @@ Shuangyu Yu, Yaxin Yu, Yulong Li, and Xin Liu.
 \newblock ISBN 978-1-4799-5705-7.
 \newblock \doi{10.1109/MDM.2014.56}.
 \newblock URL \url{http://dx.doi.org/10.1109/MDM.2014.56}.
-
-\bibitem[ins()]{instagram_api}
-Instagram api.
-\newblock URL \url{http://instagram.com/developer/realtime/}.
-
-\bibitem[pub()]{pubsubhubbub}
-The pubsubhubbub protocol.
-\newblock URL \url{https://en.wikipedia.org/wiki/PubSubHubbub}.
 
 \bibitem[Blondel et~al.(2008)Blondel, Guillaume, Lambiotte, and
   Lefebvre]{blondel2008fast}
@@ -79,10 +81,6 @@ Xiaohui Yan, Jiafeng Guo, Yanyan Lan, and Xueqi Cheng.
 \newblock ISBN 978-1-4503-2035-1.
 \newblock URL \url{http://dl.acm.org/citation.cfm?id=2488388.2488514}.
 
-\bibitem[btm()]{btm-website}
-Google code website of btm.
-\newblock URL \url{https://code.google.com/p/btm/}.
-
 \bibitem[Zheng and Xie(2011)]{Zheng:2011:LTR:1889681.1889683}
 Yu~Zheng and Xing Xie.
 \newblock Learning travel recommendations from user-generated gps traces.
@@ -91,9 +89,5 @@ Yu~Zheng and Xing Xie.
 \newblock ISSN 2157-6904.
 \newblock \doi{10.1145/1889681.1889683}.
 \newblock URL \url{http://doi.acm.org/10.1145/1889681.1889683}.
-
-\bibitem[lou()]{louvin-repository}
-Louvin community detection repository.
-\newblock URL \url{https://bitbucket.org/taynaud/python-louvain}.
 
 \end{thebibliography}

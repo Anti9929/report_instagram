@@ -3,51 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: report.aux
 The style file: unsrtnat.bst
 Database file #1: references.bib
-Warning--I didn't find a database entry for ""
-Warning--empty year in instagram_api
-Warning--empty year in pubsubhubbub
 Warning--empty booktitle in Ester96adensity-based
-Warning--empty year in btm-website
-Warning--empty year in louvin-repository
-You've used 13 entries,
+You've used 10 entries,
             2481 wiz_defined-function locations,
-            644 strings with 7243 characters,
-and the built_in function-call counts, 5663 in all, are:
-= -- 501
-> -- 271
+            639 strings with 7161 characters,
+and the built_in function-call counts, 5195 in all, are:
+= -- 459
+> -- 292
 < -- 6
 + -- 108
-- -- 82
-* -- 451
-:= -- 833
-add.period$ -- 48
-call.type$ -- 13
-change.case$ -- 26
-chr.to.int$ -- 13
-cite$ -- 22
-duplicate$ -- 276
-empty$ -- 523
-format.name$ -- 93
-if$ -- 1244
+- -- 88
+* -- 432
+:= -- 816
+add.period$ -- 46
+call.type$ -- 10
+change.case$ -- 20
+chr.to.int$ -- 10
+cite$ -- 11
+duplicate$ -- 242
+empty$ -- 433
+format.name$ -- 100
+if$ -- 1122
 int.to.chr$ -- 1
-int.to.str$ -- 14
-missing$ -- 9
-newline$ -- 79
-num.names$ -- 27
-pop$ -- 119
+int.to.str$ -- 11
+missing$ -- 10
+newline$ -- 70
+num.names$ -- 30
+pop$ -- 77
 preamble$ -- 1
-purify$ -- 13
+purify$ -- 10
 quote$ -- 0
-skip$ -- 196
+skip$ -- 152
 stack$ -- 0
-substring$ -- 302
-swap$ -- 67
+substring$ -- 292
+swap$ -- 63
 text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 91
-warning$ -- 5
-while$ -- 39
+type$ -- 70
+warning$ -- 1
+while$ -- 41
 width$ -- 0
-write$ -- 186
-(There were 6 warnings)
+write$ -- 167
+(There was 1 warning)
